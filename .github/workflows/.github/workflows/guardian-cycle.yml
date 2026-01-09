@@ -1,0 +1,13 @@
+name: Guardian Cycle
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cycle:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Guardian cycle alive"
