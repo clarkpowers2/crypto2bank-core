@@ -5,9 +5,17 @@ on:
   schedule:
     - cron: "*/5 * * * *"
 
+permissions:
+  contents: read
+
+concurrency:
+  group: guardian-autonomous-cycle
+  cancel-in-progress: true
+
 jobs:
   guardian:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     defaults:
       run:
