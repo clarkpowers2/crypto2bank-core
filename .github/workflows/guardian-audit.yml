@@ -1,0 +1,28 @@
+name: Guardian Audit
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  security-events: write
+
+jobs:
+  guardian-audit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Guardian heartbeat
+        run: echo "Guardian audit active"
+
+      - name: Dependency audit (if Node exists)
+        if: hashFiles('**/package-lock.json') != ''
+        run: npm audit --audit-level=high
