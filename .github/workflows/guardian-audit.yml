@@ -2,15 +2,12 @@ name: Guardian Full System Audit
 
 on:
   schedule:
-    # Runs every 6 hours (adjust as needed)
     - cron: "0 */6 * * *"
-
-  workflow_dispatch: # allows manual runs
+  workflow_dispatch:
 
 jobs:
   guardian-audit:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -20,18 +17,16 @@ jobs:
         with:
           node-version: 20
 
-- name: Install dependencies (core)
-  working-directory: packages/core
-  run: |
-    npm ci
+      - name: Install dependencies
+        working-directory: crypto2bank/crypto2bank-verify/packages/core
+        run: npm ci
 
-      - name: Run Guardian Full Audit (READ-ONLY)
+      - name: Run Guardian Full Audit
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        working-directory: crypto2bank/crypto2bank-verify/packages/core
         run: |
-working-directory: packages/core
-run: |
-  node guardian/guardian.js audit \
+          node ../../guardian-core/cli/guardian.js audit \
             --target=all \
             --mode=full \
             --health-check \
@@ -44,4 +39,4 @@ run: |
         uses: actions/upload-artifact@v4
         with:
           name: guardian-audit-report
-          path: guardian/reports/
+          path: crypto2bank/crypto2bank-verify/packages/core/guardian/reports/
