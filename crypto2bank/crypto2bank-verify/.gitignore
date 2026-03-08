@@ -1,0 +1,4 @@
+# Re-include guardian core explicitly
+!guardian-core/
+!guardian-core/**
+.replit

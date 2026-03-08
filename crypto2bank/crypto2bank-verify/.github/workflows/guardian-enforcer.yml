@@ -1,0 +1,44 @@
+name: Guardian Compliance Enforcer
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  guardian:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Guardian — Scan for forbidden secrets
+        run: |
+          echo "🔍 Guardian: scanning for forbidden files"
+          FORBIDDEN=$(git grep -n -E "(ghp_|github_pat_|-----BEGIN PRIVATE KEY-----)" || true)
+          if [ -n "$FORBIDDEN" ]; then
+            echo "❌ Guardian blocked push: secret detected"
+            echo "$FORBIDDEN"
+            exit 1
+          fi
+
+      - name: Guardian — Enforce .gitignore
+        run: |
+          echo "🔐 Guardian: enforcing .gitignore"
+          grep -q ".replit" .gitignore || echo ".replit" >> .gitignore
+          grep -q ".env" .gitignore || echo ".env" >> .gitignore
+
+      - name: Guardian — Validate workflows
+        run: |
+          echo "🧠 Guardian: validating workflows"
+          for f in .github/workflows/*.yml; do
+            echo "Checking $f"
+            yq e '.' "$f" > /dev/null
+          done
